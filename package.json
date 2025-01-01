@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node -r dotenv/config index.js",
-    "dev": "PORT=8080 nodemon index.js"
+    "dev": "PORT=49152 nodemon index.js"
   },
   "dependencies": {
     "express": "^4.18.2"
