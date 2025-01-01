@@ -1,7 +1,9 @@
 // Basic Express server setup
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 8080;
+
+// Ensure port is explicitly set
+const PORT = parseInt(process.env.PORT || '8080');
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -18,14 +20,23 @@ app.get('/', (req, res) => {
 });
 
 // Start server with error handling
-app.listen(port, '0.0.0.0', (err) => {
-  if (err) {
-    console.error('Error starting server:', err);
-    return;
-  }
-  console.log(`Server is running on port ${port}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server is running on port ${PORT}`);
 }).on('error', (err) => {
-  console.error('Server error:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please try a different port.`);
+    process.exit(1);
+  } else {
+    console.error('Server error:', err);
+  }
+});
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  server.close(() => {
+    console.log('Server shutting down');
+    process.exit(0);
+  });
 });
 
 // Handle uncaught exceptions
