@@ -1,7 +1,7 @@
 // Basic Express server setup
 const express = require('express');
 const app = express();
-const port = process.env.PORT || 3000;
+let port = process.env.PORT || 3000;
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -17,16 +17,27 @@ app.get('/', (req, res) => {
   res.send('Century Security API is running');
 });
 
-// Start server with error handling
-app.listen(port, (err) => {
-  if (err) {
-    console.error('Error starting server:', err);
-    return;
-  }
-  console.log(`Server is running on port ${port}`);
-}).on('error', (err) => {
-  console.error('Server error:', err);
-});
+// Function to try different ports
+const startServer = (retries = 10) => {
+  app.listen(port, (err) => {
+    if (err) {
+      if (retries > 0 && err.code === 'EADDRINUSE') {
+        console.log(`Port ${port} is busy, trying port ${port + 1}`);
+        port += 1;
+        startServer(retries - 1);
+      } else {
+        console.error('Error starting server:', err);
+      }
+      return;
+    }
+    console.log(`Server is running on port ${port}`);
+  }).on('error', (err) => {
+    console.error('Server error:', err);
+  });
+};
+
+// Start the server
+startServer();
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
