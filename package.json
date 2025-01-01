@@ -1,29 +1,12 @@
 {
-  "name": "api-documentation",
+  "name": "century-security",
   "version": "1.0.0",
-  "private": true,
+  "main": "index.js",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "dependencies": {x
-    "next": "^14.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "swagger-ui-react": "^5.0.0",
-    "prismjs": "^1.29.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "@types/swagger-ui-react": "^4.18.0",
-    "@types/prismjs": "^1.26.0",
-    "typescript": "^5.0.0",
-    "eslint": "^8.0.0",
-    "eslint-config-next": "^14.0.0"
+  "dependencies": {
+    "express": "^4.18.2"
   }
 } 
