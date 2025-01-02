@@ -1,17 +1,120 @@
-model Shift {
-  id          String   @id @default(cuid())
-  status      String   // OPEN, PENDING, FILLED, etc.
-  // other shift fields...
-  applications ShiftApplication[]
+generator client {
+  provider = "prisma-client-js"
 }
 
-model ShiftApplication {
-  id        String   @id @default(cuid())
-  shift     Shift    @relation(fields: [shiftId], references: [id])
-  shiftId   String
-  user      User     @relation(fields: [userId], references: [id])
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  name           String
+  hashedPassword String
+  role           Role      @default(USER)
+  profile        Profile?
+  shifts         Shift[]
+  timesheets     Timesheet[]
+  documents      Document[]
+  trainings      Training[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Profile {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  phone         String?
+  address       String?
+  licenseNumber String?
+  licenseExpiry DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Shift {
+  id        String    @id @default(cuid())
   userId    String
-  status    String   // PENDING, APPROVED, REJECTED
-  notes     String?
-  createdAt DateTime @default(now())
+  user      User      @relation(fields: [userId], references: [id])
+  startTime DateTime
+  endTime   DateTime
+  venue     String
+  status    ShiftStatus @default(PENDING)
+  mealBreak Boolean   @default(true)
+  cost      Float
+  chargeOut Float
+  published Boolean   @default(false)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Timesheet {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  startTime   DateTime
+  endTime     DateTime
+  status      TimesheetStatus @default(PENDING)
+  hoursWorked Float
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Document {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  type        DocumentType
+  name        String
+  url         String
+  expiryDate  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Training {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  name            String
+  status          TrainingStatus @default(PENDING)
+  completionDate  DateTime?
+  expiryDate      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  MANAGER
+}
+
+enum ShiftStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  COMPLETED
+}
+
+enum TimesheetStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum DocumentType {
+  LICENSE
+  INSURANCE
+  CERTIFICATION
+  OTHER
+}
+
+enum TrainingStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
 } 
